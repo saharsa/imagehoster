@@ -125,7 +125,7 @@ public class ImageController {
 
         User user = (User) session.getAttribute("loggeduser");
         // If logged in user and image upload user are same, then allow editing, else don't allow
-        if(user!=null && image.getUser()!=null && image.getUser().getId().equals(user.getId())){
+        if(user!=null && image.getUser()!=null && image.getUser().getId()!=null && image.getUser().getId().equals(user.getId())){
             String tags = convertTagsToString(image.getTags());
             model.addAttribute("image", image);
             model.addAttribute("tags", tags);
@@ -192,7 +192,7 @@ public class ImageController {
 
         User user = (User) session.getAttribute("loggeduser");
         // If logged in user and image upload user are same, then allow deleting, else don't allow
-        if(image!=null && user!=null && image.getUser()!=null && image.getUser().getId().equals(user.getId())){
+        if(image!=null && user!=null && image.getUser()!=null && image.getUser().getId()!=null && image.getUser().getId().equals(user.getId())){
             imageService.deleteImage(imageId);
             return "redirect:/images";
         }else{
