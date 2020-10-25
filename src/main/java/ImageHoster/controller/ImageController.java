@@ -112,13 +112,32 @@ public class ImageController {
     //The method first needs to convert the list of all the tags to a string containing all the tags separated by a comma and then add this string in a Model type object
     //This string is then displayed by 'edit.html' file as previous tags of an image
     @RequestMapping(value = "/editImage")
-    public String editImage(@RequestParam("imageId") Integer imageId, Model model) {
+    public String editImage(@RequestParam("imageId") Integer imageId, Model model, HttpSession session) {
+        // If no image id is provided for editing, then redirecting to images
+        if(imageId == null){
+            return "redirect:/images";
+        }
         Image image = imageService.getImage(imageId);
+        // If image does not exist, then redirecting to images
+        if(image == null){
+            return "redirect:/images";
+        }
 
-        String tags = convertTagsToString(image.getTags());
-        model.addAttribute("image", image);
-        model.addAttribute("tags", tags);
-        return "images/edit";
+        User user = (User) session.getAttribute("loggeduser");
+        // If logged in user and image upload user are same, then allow editing, else don't allow
+        if(user!=null && image.getUser()!=null && image.getUser().getId().equals(user.getId())){
+            String tags = convertTagsToString(image.getTags());
+            model.addAttribute("image", image);
+            model.addAttribute("tags", tags);
+            return "images/edit";
+        }else{
+            String error = "Only the owner of the image can edit the image";
+            model.addAttribute("editError", error);
+            model.addAttribute("image", image);
+            model.addAttribute("tags", image.getTags());
+            return "images/image";
+        }
+
     }
 
     //This controller method is called when the request pattern is of type 'images/edit' and also the incoming request is of PUT type
@@ -160,9 +179,29 @@ public class ImageController {
     //The method calls the deleteImage() method in the business logic passing the id of the image to be deleted
     //Looks for a controller method with request mapping of type '/images'
     @RequestMapping(value = "/deleteImage", method = RequestMethod.DELETE)
-    public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId) {
-        imageService.deleteImage(imageId);
-        return "redirect:/images";
+    public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId, Model model, HttpSession session) {
+        // If no image id is provided for editing, then redirecting to images
+        if(imageId == null){
+            return "redirect:/images";
+        }
+        Image image = imageService.getImage(imageId);
+        // If image does not exist, then redirecting to images
+        if(image == null){
+            return "redirect:/images";
+        }
+
+        User user = (User) session.getAttribute("loggeduser");
+        // If logged in user and image upload user are same, then allow deleting, else don't allow
+        if(image!=null && user!=null && image.getUser()!=null && image.getUser().getId().equals(user.getId())){
+            imageService.deleteImage(imageId);
+            return "redirect:/images";
+        }else{
+            String error = "Only the owner of the image can delete the image";
+            model.addAttribute("deleteError", error);
+            model.addAttribute("image", image);
+            model.addAttribute("tags", image.getTags());
+            return "images/image";
+        }
     }
 
 
