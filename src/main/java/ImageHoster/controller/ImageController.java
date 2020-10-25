@@ -53,6 +53,26 @@ public class ImageController {
         return "images/image";
     }
 
+    /**
+     * This controller method is mapped to /images/{imageId}/{title} path. It fetches the image from the database
+     * corresponding to the id. It receives the dynamic parameter imageId and title from incoming request URL.
+     * Calls the getImage(imageId) method of ImageService.
+     * Add the image in the Model type object with 'image' as the key
+     * Return 'images/image.html' file
+     * Also now you need to add the tags of an image in the Model type object
+     * @param imageId Unique identifier of the image
+     * @param title Title of the image
+     * @param model Model which contains the view details
+     * @return images/image.html file
+     */
+    @RequestMapping("/images/{imageId}/{title}")
+    public String showImage(@PathVariable("imageId") Integer imageId, @PathVariable("title") String title, Model model) {
+        Image image = imageService.getImage(imageId);
+        model.addAttribute("image", image);
+        model.addAttribute("tags", image.getTags());
+        return "images/image";
+    }
+
     //This controller method is called when the request pattern is of type 'images/upload'
     //The method returns 'images/upload.html' file
     @RequestMapping("/images/upload")
