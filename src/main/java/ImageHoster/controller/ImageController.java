@@ -127,8 +127,7 @@ public class ImageController {
 
     User user = (User) session.getAttribute("loggeduser");
     // If logged in user and image upload user are same, then allow editing, else don't allow
-    if (user != null && image.getUser() != null && image.getUser().getId() != null && image
-        .getUser().getId().equals(user.getId())) {
+    if (isImageOwner(image, user)) {
       String tags = convertTagsToString(image.getTags());
       model.addAttribute("image", image);
       model.addAttribute("tags", tags);
@@ -196,8 +195,7 @@ public class ImageController {
 
     User user = (User) session.getAttribute("loggeduser");
     // If logged in user and image upload user are same, then allow deleting, else don't allow
-    if (image != null && user != null && image.getUser() != null && image.getUser().getId() != null
-        && image.getUser().getId().equals(user.getId())) {
+    if (isImageOwner(image, user)) {
       imageService.deleteImage(imageId);
       return "redirect:/images";
     } else {
@@ -249,10 +247,32 @@ public class ImageController {
     return tagString.toString();
   }
 
+  /**
+   * Sets the image, tags and comments value in the Model object and returns image template path
+   *
+   * @param image Image that needs to be stored in model
+   * @param model Model object required by View
+   * @return
+   */
   private String setImage(Image image, Model model) {
     model.addAttribute("image", image);
     model.addAttribute("tags", image.getTags());
     model.addAttribute("comments", image.getComments());
     return "images/image";
+  }
+
+  /**
+   * Checks if logged in user and image owner are same
+   *
+   * @param image Image object
+   * @param user  Currently logged in user
+   * @return boolean value
+   */
+  private boolean isImageOwner(Image image, User user) {
+    if (user != null && image.getUser() != null && image.getUser().getId() != null && image
+        .getUser().getId().equals(user.getId())) {
+      return true;
+    }
+    return false;
   }
 }

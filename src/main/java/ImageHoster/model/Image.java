@@ -62,6 +62,7 @@ public class Image {
   @ManyToMany(fetch = FetchType.LAZY)
   private List<Tag> tags = new ArrayList<>();
 
+  // List of all comments added to the image. If image is deleted then comments should also be deleted along with it.
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "image", cascade = CascadeType.ALL)
   private List<Comment> comments;
 

@@ -1,6 +1,5 @@
 package ImageHoster.controller;
 
-import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.User;
 import ImageHoster.service.CommentService;
@@ -8,7 +7,6 @@ import ImageHoster.service.ImageService;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,25 +21,23 @@ public class CommentController {
   @Autowired
   private CommentService commentService;
 
+  /**
+   * Controller method for adding a new comment on a image
+   *
+   * @param text    Comment text
+   * @param imageId Image id for which comment is being added
+   * @param title   Image title for which comment is being added
+   * @param session Session object stores the current logged in user information
+   * @return Redirects to the image where the comment was being added
+   */
   @RequestMapping(value = "/image/{imageId}/{imageTitle}/comments", method = RequestMethod.POST)
   public String addComment(@RequestParam("comment") String text,
       @PathVariable("imageId") Integer imageId, @PathVariable("imageTitle") String title,
-      Model model, HttpSession session) {
+      HttpSession session) {
     Image image = imageService.getImage(imageId);
-    Comment comment = new Comment();
-    comment.setImage(image);
     User user = (User) session.getAttribute("loggeduser");
-    comment.setUser(user);
-    comment.setText(text);
-    commentService.addComment(comment);
-    return setImage(image, model);
-  }
-
-  private String setImage(Image image, Model model) {
-    model.addAttribute("image", image);
-    model.addAttribute("tags", image.getTags());
-    model.addAttribute("comments", image.getComments());
-    return "redirect:/images/" + image.getId() + "/" + image.getTitle();
+    commentService.addComment(text, user, image);
+    return "redirect:/images/" + imageId + "/" + title;
   }
 
 }
