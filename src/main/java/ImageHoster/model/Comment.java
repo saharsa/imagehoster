@@ -16,21 +16,23 @@ public class Comment {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  //@Column annotation specifies that the attribute will be mapped to the column in the database.
-  //Here the column name is explicitly mentioned as 'id'
   @Column(name = "id")
   private Integer id;
 
+  // Comment text
   @Column(name = "text")
   private String text;
 
+  // Date on which comment was added to the image
   @Column(name = "created_date")
   private LocalDate createdDate;
 
+  // User who added the comment
   @ManyToOne
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
+  // Image to which comment was added
   @ManyToOne
   @JoinColumn(name = "image_id", nullable = false)
   private Image image;

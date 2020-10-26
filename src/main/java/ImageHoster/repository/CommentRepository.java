@@ -14,6 +14,11 @@ public class CommentRepository {
   @PersistenceUnit(unitName = "imageHoster")
   private EntityManagerFactory emf;
 
+  /**
+   * Creates a new row in the 'comment' table
+   * @param newComment New comment object that should be saved in the database
+   * @return
+   */
   public Comment addComment(Comment newComment) {
     EntityManager em = emf.createEntityManager();
     EntityTransaction transaction = em.getTransaction();
