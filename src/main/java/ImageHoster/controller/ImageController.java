@@ -1,10 +1,8 @@
 package ImageHoster.controller;
 
-import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.Tag;
 import ImageHoster.model.User;
-import ImageHoster.service.CommentService;
 import ImageHoster.service.ImageService;
 import ImageHoster.service.TagService;
 import java.io.IOException;
@@ -30,9 +28,6 @@ public class ImageController {
   private ImageService imageService;
 
   @Autowired
-  private CommentService commentService;
-
-  @Autowired
   private TagService tagService;
 
   //This method displays all the images in the user home page after successful login
@@ -56,7 +51,6 @@ public class ImageController {
   @RequestMapping("/images/{title}")
   public String showImage(@PathVariable("title") String title, Model model) {
     Image image = imageService.getImageByTitle(title);
-
     return "images/image";
   }
 
@@ -180,7 +174,7 @@ public class ImageController {
     updatedImage.setDate(new Date());
 
     imageService.updateImage(updatedImage);
-    return "redirect:/images/" + updatedImage.getTitle();
+    return "redirect:/images/" + updatedImage.getId() + "/" + updatedImage.getTitle();
   }
 
 
@@ -212,21 +206,6 @@ public class ImageController {
       return setImage(image, model);
     }
   }
-
-  @RequestMapping(value = "/image/{imageId}/{imageTitle}/comments", method = RequestMethod.POST)
-  public String addComment(@RequestParam("comment") String text,
-      @PathVariable("imageId") Integer imageId, @PathVariable("imageTitle") String title,
-      Model model, HttpSession session) {
-    Image image = imageService.getImage(imageId);
-    Comment comment = new Comment();
-    comment.setImage(image);
-    User user = (User) session.getAttribute("loggeduser");
-    comment.setUser(user);
-    comment.setText(text);
-    commentService.addComment(comment);
-    return setImage(image, model);
-  }
-
 
   //This method converts the image to Base64 format
   private String convertUploadedFileToBase64(MultipartFile file) throws IOException {
